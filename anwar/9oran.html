@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة Manus - رفيقك الإيماني المتكامل</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600&family=Amiri+Quran&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #1a535c;
+      --secondary-color: #4ecdc4;
+      --accent-color: #f7fff7;
+      --highlight-color: #ff6b6b;
+      --dark-text: #073b4c;
+      --light-text: #ffffff;
+      --bg-color: #f0f7f6;
+      --border-radius: 12px;
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.07 );
+    }
+    body {
+      font-family: 'Readex Pro', sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      color: var(--dark-text);
+      display: flex;
+    }
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(180deg, var(--primary-color), #11424a);
+      color: var(--light-text);
+      padding: 20px;
+      height: 100vh;
+      position: fixed;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      overflow-y: auto;
+    }
+    .sidebar-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .sidebar-header h1 {
+      font-family: 'Amiri Quran', serif;
+      font-size: 2rem;
+      margin: 0;
+      color: var(--secondary-color);
+    }
+    .sidebar-nav ul {
+      list-style: none;
+      padding: 0;
+    }
+    .sidebar-nav li a {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      color: var(--light-text);
+      text-decoration: none;
+      border-radius: var(--border-radius);
+      transition: background-color 0.3s;
+      font-size: 1.1rem;
+    }
+    .sidebar-nav li a:hover, .sidebar-nav li a.active {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    .sidebar-nav li a svg {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      text-align: center;
+      font-size: 0.8rem;
+      opacity: 0.7;
+      padding-top: 20px;
+    }
+    .main-content {
+      margin-right: 260px;
+      width: calc(100% - 260px);
+      padding: 30px;
+    }
+    .page {
+      display: none;
+    }
+    .page.active {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .page-header {
+      margin-bottom: 30px;
+    }
+    .page-header h2 {
+      font-size: 2.5rem;
+      margin: 0;
+      color: var(--primary-color);
+    }
+    .card {
+      background-color: var(--light-text);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+    .button {
+      padding: 12px 25px;
+      background-color: var(--primary-color);
+      color: var(--light-text);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .button:hover { background-color: #11424a; }
+    /* Quran Page */
+    .quran-controls { display: flex; gap: 10px; margin-bottom: 20px; }
+    #quran-search, #surah-select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    #surah-content {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 20px;
+      border: 1px solid #eee;
+      border-radius: var(--border-radius);
+      font-family: 'Amiri Quran', serif;
+      font-size: 1.6rem;
+      line-height: 2.5;
+    }
+    /* Prayer Times */
+    #prayer-times-list {
+      list-style: none; padding: 0; margin-top: 15px;
+    }
+    #prayer-times-list li {
+      display: flex; justify-content: space-between; padding: 15px; border-radius: 8px;
+    }
+    #prayer-times-list li:not(:last-child) { border-bottom: 1px solid var(--bg-color); }
+    #prayer-times-list li span:first-child { font-weight: 600; color: var(--primary-color); }
+    #prayer-times-list li span:last-child { font-size: 1.2rem; font-weight: 500; }
+    /* Schedule Table */
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: center; }
+    th, td { padding: 15px; border-bottom: 1px solid var(--border-color); }
+    th { background-color: var(--bg-color); color: var(--primary-color); font-weight: 600; }
+    /* Wudu Section */
+    .video-wrapper {
+        position: relative; padding-bottom: 56.25%; height: 0;
+        overflow: hidden; max-width: 100%; border-radius: var(--border-radius); margin-bottom: 30px;
+    }
+    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    .step-item {
+        display: flex; align-items: center; gap: 15px;
+        background-color: var(--bg-color); padding: 15px; border-radius: var(--border-radius);
+    }
+    .step-item .step-icon {
+        background-color: var(--secondary-color); color: var(--light-text);
+        width: 50px; height: 50px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .step-item .step-icon svg { width: 24px; height: 24px; }
+    /* Responsive */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar {
+        width: 100%; height: auto; position: relative; flex-direction: row;
+        justify-content: space-around; padding: 10px;
+      }
+      .sidebar-header, .sidebar-footer { display: none; }
+      .sidebar-nav ul { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+      .sidebar-nav li a { padding: 10px; }
+      .sidebar-nav li a span { display: none; }
+      .main-content { margin-right: 0; width: 100%; padding: 15px; }
+      .page-header h2 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>Manus</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="#quran" class="nav-link active">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4 20h16V4H4v16zm2-14h12v12H6V6zM8 9h8v2H8V9zm0 4h8v2H8v-2z"/></svg>
+          <span>القرآن الكريم</span>
+        </a></li>
+        <li><a href="#azkar" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5c0 1.48.65 2.79 1.67 3.67C6.55 11.41 2 12.43 2 14v2h20v-2c0-1.57-4.55-2.59-6.67-3.33A4.99 4.99 0 0 0 17 7a5 5 0 0 0-5-5zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+          <span>الأذكار</span>
+        </a></li>
+        <li><a href="#prayer-times" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm1-13h-2v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+          <span>مواقيت الصلاة</span>
+        </a></li>
+        <li><a href="#schedule" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+          <span>جدول الدورات</span>
+        </a></li>
+        <li><a href="#wudu" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a9.96 9.96 0 0 1-7.07-2.93A9.96 9.96 0 0 1 2 12c0-3.53 1.84-6.64 4.58-8.36L2 2l1.41-1.41 4.24 4.24A9.92 9.92 0 0 1 12 4a10 10 0 0 1 10 10c0 2.61-1 5-2.93 7.07A9.96 9.96 0 0 1 12 22zM8 12c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4-4-1.79-4-4z"/></svg>
+          <span>تعلم الوضوء</span>
+        </a></li>
+        <li><a href="#contact" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          <span>التواصل</span>
+        </a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <p>&copy; 2025 - منصة Manus</p>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <!-- Quran Page -->
+    <div id="quran" class="page active">
+      <div class="page-header"><h2>القرآن الكريم</h2></div>
+      <div class="card">
+        <div class="quran-controls">
+          <input type="search" id="quran-search" placeholder="ابحث عن آية أو كلمة...">
+          <select id="surah-select"></select>
+        </div>
+        <div id="surah-content"><p>اختر سورة أو ابحث لعرض الآيات...</p></div>
+      </div>
+    </div>
+
+    <!-- Azkar Page -->
+    <div id="azkar" class="page">
+        <div class="page-header"><h2>الأذكار اليومية</h2></div>
+        <div class="card">
+            <!-- ... (Azkar content from previous version ) ... -->
+        </div>
+    </div>
+
+    <!-- Prayer Times Page -->
+    <div id="prayer-times" class="page">
+        <div class="page-header"><h2>مواقيت الصلاة</h2></div>
+        <div class="card">
+            <h3 id="prayer-location">جاري تحديد موقعك...</h3>
+            <ul id="prayer-times-list"></ul>
+        </div>
+    </div>
+
+    <!-- Schedule Page -->
+    <div id="schedule" class="page">
+        <div class="page-header"><h2>جدول الدورات الأسبوعي</h2></div>
+        <div class="card">
+            <h3>مسجد الأندلس (بعد صلاة المغرب)</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>اليوم</th><th>الدورة</th><th>المحاضر</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>الاثنين</td><td>شرح كتاب التوحيد</td><td>الشيخ/ عبد الرحمن السديس</td></tr>
+                        <tr><td>الثلاثاء</td><td>تفسير سورة البقرة</td><td>الشيخ/ صالح المغامسي</td></tr>
+                        <tr><td>الأربعاء</td><td>دروس في السيرة النبوية</td><td>الشيخ/ نبيل العوضي</td></tr>
+                        <tr><td>الخميس</td><td>فقه العبادات</td><td>الشيخ/ محمد العريفي</td></tr>
+                        <tr><td>الجمعة</td><td>محاضرة عامة</td><td>ضيف الأسبوع</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wudu Page -->
+    <div id="wudu" class="page">
+        <div class="page-header"><h2>تعلم الوضوء</h2></div>
+        <div class="card">
+            <h3>فيديو تعليمي</h3>
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/eK4i2rAIO1A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <h3>الخطوات بالتفصيل</h3>
+            <div class="steps-grid">
+                <div class="step-item"><div class="step-icon">1</div><span>النية والتسمية (بسم الله ).</span></div>
+                <div class="step-item"><div class="step-icon">2</div><span>غسل الكفين ثلاث مرات.</span></div>
+                <div class="step-item"><div class="step-icon">3</div><span>المضمضة والاستنشاق ثلاث مرات.</span></div>
+                <div class="step-item"><div class="step-icon">4</div><span>غسل الوجه كاملاً ثلاث مرات.</span></div>
+                <div class="step-item"><div class="step-icon">5</div><span>غسل اليدين إلى المرفقين ثلاث مرات.</span></div>
+                <div class="step-item"><div class="step-icon">6</div><span>مسح الرأس والأذنين مرة واحدة.</span></div>
+                <div class="step-item"><div class="step-icon">7</div><span>غسل القدمين إلى الكعبين ثلاث مرات.</span></div>
+                <div class="step-item"><div class="step-icon">8</div><span>الدعاء بعد الوضوء.</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Page -->
+    <div id="contact" class="page">
+        <div class="page-header"><h2>تواصل معنا</h2></div>
+        <div class="card">
+            <p>للانضمام أو الاستفسار، نسعد بتواصلك عبر القنوات التالية:</p>
+            <a href="https://wa.me/212775407114" target="_blank" class="button">مراسلة عبر واتساب</a>
+            <a href="mailto:aissatamim2005@gmail.com" class="button">إرسال بريد إلكتروني</a>
+        </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function( ) {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const pages = document.querySelectorAll('.page');
+
+      // Navigation
+      function showPage(targetId) {
+          navLinks.forEach(l => l.classList.remove('active'));
+          document.querySelector(`.nav-link[href="${targetId}"]`).classList.add('active');
+
+          pages.forEach(page => {
+            if ('#' + page.id === targetId) {
+              page.classList.add('active');
+            } else {
+              page.classList.remove('active');
+            }
+          });
+      }
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          const targetId = link.getAttribute('href');
+          showPage(targetId);
+        });
+      });
+      
+      // --- Prayer Times Logic ---
+      function fetchPrayerTimes() {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+              const { latitude, longitude } = position.coords;
+              const date = new Date();
+              const url = `https://api.aladhan.com/v1/calendar/${date.getFullYear( )}/${date.getMonth() + 1}?latitude=${latitude}&longitude=${longitude}&method=4`;
+
+              fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                  const today = date.getDate() - 1;
+                  const timings = data.data[today].timings;
+                  document.getElementById('prayer-location').textContent = `مواقيت الصلاة لهذا اليوم (توقيت تقريبي)`;
+                  const prayerList = document.getElementById('prayer-times-list');
+                  prayerList.innerHTML = `<li><span>الفجر</span> <span>${timings.Fajr}</span></li><li><span>الشروق</span> <span>${timings.Sunrise}</span></li><li><span>الظهر</span> <span>${timings.Dhuhr}</span></li><li><span>العصر</span> <span>${timings.Asr}</span></li><li><span>المغرب</span> <span>${timings.Maghrib}</span></li><li><span>العشاء</span> <span>${timings.Isha}</span></li>`;
+                }).catch(error => document.getElementById('prayer-location').textContent = "فشل جلب المواقيت.");
+            }, () => {
+                document.getElementById('prayer-location').textContent = "يرجى السماح بالوصول للموقع لعرض المواقيت.";
+            });
+          } else {
+            document.getElementById('prayer-location').textContent = "المتصفح لا يدعم تحديد الموقع.";
+          }
+      }
+
+      // --- Quran Logic ---
+      const quranApiUrl = 'https://api.quran.com/api/v4/';
+      const surahSelect = document.getElementById('surah-select' );
+      const surahContent = document.getElementById('surah-content');
+      const quranSearch = document.getElementById('quran-search');
+      let chaptersData = [];
+
+      fetch(`${quranApiUrl}chapters?language=ar`)
+        .then(res => res.json())
+        .then(data => {
+          chaptersData = data.chapters;
+          surahSelect.innerHTML = '<option value="">اختر سورة...</option>';
+          chaptersData.forEach(chapter => {
+            surahSelect.innerHTML += `<option value="${chapter.id}">${chapter.id}. ${chapter.name_arabic}</option>`;
+          });
+        });
+
+      surahSelect.addEventListener('change', () => {
+        const chapterId = surahSelect.value;
+        if (!chapterId) return;
+        fetchSurah(chapterId);
+      });
+
+      quranSearch.addEventListener('input', () => {
+        const query = quranSearch.value;
+        if (query.length < 3) return;
+        fetch(`${quranApiUrl}search?q=${query}&language=ar`)
+          .then(res => res.json())
+          .then(data => {
+            surahContent.innerHTML = '';
+            data.search.results.forEach(result => {
+              surahContent.innerHTML += `<div class="ayah" data-ayah-key="${result.verse_key}">${result.text} [${result.verse_key}]</div>`;
+            });
+          });
+      });
+
+      function fetchSurah(chapterId) {
+        fetch(`${quranApiUrl}quran/verses/uthmani?chapter_number=${chapterId}`)
+          .then(res => res.json())
+          .then(data => {
+            surahContent.innerHTML = `<h3>سورة ${chaptersData.find(c => c.id == chapterId).name_arabic}</h3>`;
+            data.verses.forEach(verse => {
+              surahContent.innerHTML += `<span class="ayah" data-ayah-key="${verse.verse_key}">${verse.text_uthmani} ﴿${verse.verse_key.split(':')[1]}﴾</span> `;
+            });
+          });
+      }
+
+      // Initial load
+      showPage('#quran');
+      fetchPrayerTimes();
+    });
+  </script>
+
+</body>
+</html>
